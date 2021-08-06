@@ -4,4 +4,4 @@ RUN pip install -r requirements.txt
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
-CMD streamlit run application.py --server.port $PORT
+CMD streamlit run application.py --server.port 8080
