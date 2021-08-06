@@ -42,7 +42,6 @@ This view will allow you to understand the risk of these CUSIPS.
 
 
 def main():
-    desired_cusips = 1
     view_name = st.sidebar.selectbox("Choose a view", list(VIEWS.keys()), 0)
     view = VIEWS[view_name][0]
 
