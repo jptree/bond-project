@@ -1,0 +1,5 @@
+Command to build the application.
+"C:\Users\jason\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin\gcloud" builds submit --tag gcr.io/bond-project-322202/bond-analysis-dashboard  --project=bond-project-322202
+
+Command to deploy the application
+"C:\Users\jason\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin\gcloud" run deploy --image gcr.io/bond-project-322202/bond-analysis-dashboard --platform managed  --project=bond-project-322202 --allow-unauthenticated

@@ -1,2 +1,0 @@
-https://docs.docker.com/docker-hub/repos/
-docker tag <existing-image> <hub-user>/<repo-name>[:<tag>]
