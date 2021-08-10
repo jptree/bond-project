@@ -5,10 +5,10 @@ def intro():
 
     st.markdown(
         """
-        This application was developed by Jason F. Petri. There are various views to select from that--all of which help
+        This application was developed by Jason F. Petri. There are various views to select from--all of which help
         in the analysis of the securities provided.
         
-        *August 6, 2021*
+        *August 10, 2021*
         """
     )
 
@@ -119,9 +119,14 @@ def individual_cusip_analysis():
 
     cusip_data = data.groupby(['cusip', 'timestamp'])['cumulative_pnl'].sum()
 
+    normalize = st.checkbox(label='Normalize data')
+
     plot_data = {}
     for c in desired_cusips:
-        plot_data[c] = cusip_data[c]
+        if normalize:
+            plot_data[c] = cusip_data[c] - cusip_data[c][0]
+        else:
+            plot_data[c] = cusip_data[c]
 
     chart = st.line_chart(plot_data)
 
@@ -135,7 +140,7 @@ def individual_cusip_analysis():
     selected_cusip_data = data[data['cusip'] == selected_cusip]['spread_pnl']
 
     fig, ax = plt.subplots()
-    n, bins, patches = ax.hist(selected_cusip_data, number_of_bins, density=False)
+    ax.hist(selected_cusip_data, number_of_bins, density=False)
     ax.set_xlabel('P&L')
     ax.set_ylabel('Frequency')
     ax.set_title(f'Frequency of P&L for {selected_cusip}, {number_of_bins} Bins')
@@ -147,6 +152,7 @@ def bucket_industry():
     import streamlit as st
     import pandas as pd
     from datetime import timedelta
+    from numpy import cumsum
     from main import cumulative_pnl, cumulative_change_window_gains_losses, cumulative_winners_losers_new
 
     # def select_all(column, key, all, label):
@@ -229,29 +235,39 @@ def bucket_industry():
 
     start_time = time_window[0]
     end_time = time_window[1]
-    data = df[(df['timestamp'] >= start_time) & (df['timestamp'] <= end_time)]
+    # data = df[(df['timestamp'] >= start_time) & (df['timestamp'] <= end_time)]
     sorting_options = ['industrySector', 'benchmark_cusip', 'mat_bucket', 'liq_bucket']
     selected_sort = st.selectbox(label='Select the characteristic you want to plot on', options=sorting_options)
+    normalize = st.checkbox(label='Normalize data')
 
-    plot_data = data.groupby([selected_sort, 'timestamp'])['cumulative_pnl'].sum()
-
+    plot_data = cumsum(data.groupby([selected_sort, 'timestamp'])['spread_pnl'].sum().unstack().T.fillna(0))
+    plot_data = plot_data[(plot_data.index >= start_time) & (plot_data.index <= end_time)]
     if len(plot_data) != 0:
 
         plot = {}
         for s in data[selected_sort].unique():
-            plot[s] = plot_data[s]
+            if normalize:
+
+                plot[s] = plot_data[s] - plot_data[s][0]
+            else:
+                plot[s] = plot_data[s]
 
         chart = st.line_chart(plot)
     else:
         st.error('No data available with the current combination of filters!')
 
-    change_pnl = data.groupby([selected_sort, 'timestamp'])['cumulative_pnl'].sum().reset_index()
-    change_pnl = change_pnl.groupby([selected_sort])['cumulative_pnl'].last() - change_pnl.groupby([selected_sort])['cumulative_pnl'].first()
-    change_pnl = change_pnl.reset_index()
-    change_pnl.columns = [selected_sort, 'Cumulative P&L Difference']
-    change_pnl = change_pnl.sort_values(by='Cumulative P&L Difference')
-    st.table(change_pnl)
+    # change_pnl = data.groupby([selected_sort, 'timestamp'])['cumulative_pnl'].sum().reset_index()
+    # change_pnl = change_pnl.groupby([selected_sort])['cumulative_pnl'].last() - change_pnl.groupby([selected_sort])['cumulative_pnl'].first()
+    # change_pnl = change_pnl.reset_index()
+    # change_pnl.columns = [selected_sort, 'Cumulative P&L Difference']
+    # change_pnl = change_pnl.sort_values(by='Cumulative P&L Difference').reset_index()[[selected_sort, 'Cumulative P&L Difference']]
+    # # st.table([change_pnl[change_pnl])
+    # st.table(change_pnl)
 
+    change_pnl = plot_data.iloc[-1] - plot_data.iloc[0]
+    change_pnl = change_pnl.sort_values().reset_index()
+    change_pnl.columns = [selected_sort, 'Cumulative P&L Difference']
+    st.table(change_pnl)
 
 
 def merchant_extraction():

@@ -6,6 +6,7 @@ import views
 LOGGER = get_logger(__name__)
 
 # D:\Python\Python38\Scripts\streamlit run D:\Python\Projects\bondProjectLocal\application.py
+# D:\Python\bondProjectLocal\Scripts\streamlit run D:\Python\Projects\bondProjectLocal\application.py
 
 # Dictionary of
 VIEWS = OrderedDict(

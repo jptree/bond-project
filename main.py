@@ -11,6 +11,7 @@ from tensorflow import expand_dims
 #
 # D:\Python\Python38\Scripts\streamlit run main.py
 # D:\Python\Python38\Scripts\streamlit run D:\Python\Projects\bondProjectLocal\main.py
+# D:\Python\bondProjectLocal\Scripts\streamlit run D:\Python\Projects\bondProjectLocal\main.py
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
